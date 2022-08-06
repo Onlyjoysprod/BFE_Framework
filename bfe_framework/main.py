@@ -1,17 +1,31 @@
-def application(environ, start_response):
-    """
-    :param environ: словарь данных от сервера
-    :param start_response: функция для ответа серверу
-    :return:
-    """
-    # сначала в функцию start_response передаем код ответа и заголовки
-    start_response('200 OK', [('Content-Type', 'text/html')])
-    # возвращаем тело ответа в виде списка из bite
-    return [b'Hello world from a simple WSGI application!']
+import sys
+sys.path.append("..")
+from views import NotFound404
+git
 
-# для запуска можно использовать gunicorn или uwsgi
+class Framework:
 
-# gunicorn simple_wsgi:application
+    """Класс Framework - основа фреймворка"""
 
-# uwsgi --http :8000 --wsgi-file main.py
+    def __init__(self, routes_obj, fronts_obj):
+        self.routes_lst = routes_obj
+        self.fronts_lst = fronts_obj
 
+    def __call__(self, environ, start_response):
+        path = environ['PATH_INFO']
+
+        if not path.endswith('/'):
+            path = f'{path}/'
+
+        if path in self.routes_lst:
+            view = self.routes_lst[path]
+        else:
+            view = NotFound404()
+        request = {}
+
+        for front in self.fronts_lst:
+            front(request)
+
+        code, body = view(request)
+        start_response(code, [('Content-Type', 'text/html')])
+        return [body.encode('utf-8')]
