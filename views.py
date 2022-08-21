@@ -43,6 +43,7 @@ class CreateCourse:
 
     def __call__(self, request):
         if request['method'] == 'POST':
+            print(request)
             data = request['data']
 
             name = data['name']
@@ -60,6 +61,7 @@ class CreateCourse:
 
         else:
             try:
+                print(request)
                 self.category_id = int(request['request_params']['id'])
                 category = site.find_category_by_id(int(self.category_id))
 
@@ -87,7 +89,7 @@ class CreateCategory:
             new_category = site.create_category(name, category)
             site.categories.append(new_category)
 
-            return '200 OK', render('index.html', objects_list=site.categories)
+            return '200 OK', render('category_list.html', objects_list=site.categories)
         else:
             categories = site.categories
             return '200 OK', render('create_category.html', categories=categories)

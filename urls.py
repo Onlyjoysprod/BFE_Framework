@@ -5,7 +5,7 @@ from views import Index, About, StudyPrograms, CoursesList, CreateCourse, \
 
 # front controller
 def secret_front(request):
-    request['data'] = date.today()
+    request['date'] = date.today()
 
 
 def other_front(request):
