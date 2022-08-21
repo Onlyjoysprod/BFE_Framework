@@ -9,18 +9,29 @@
 	{% include "inc-menu.html" %}
 {% endblock %}
 {% block body %}
-    <div>
-        <a href="/courses-list/?id={{id}}">назад</a>
+    <div id="main">
+    <div id="header">
+      <div id="logo">
+        <div id="logo_text">
+          <!-- class="logo_colour", allows you to change the colour of the text -->
+          <h1><a href="/">BFE <span class="logo_colour">учебный проект</span></a></h1>
+          <h2>сложна, но я стараюсь</h2>
+        </div>
+      </div>
+
     </div>
-
-    <br>
-    <br>
-
-    <div>
+    <div id="content_header"></div>
+    <div id="site_content">
+      <div id="content">
         <h1>Создание курса для категории "{{name}}"</h1>
         <form method="post">
             <input type="text" name="name" placeholder="Название">
-            <button type="submit">Сохранить и вернуться к списку курсов</button>
+            <button type="submit">Сохранить</button>
         </form>
+      </div>
+    </div>
+    <div id="content_footer"></div>
+    <div id="footer">
+      <p>Copyright &copy; Onlyjoy's production</p>
     </div>
 {% endblock %}

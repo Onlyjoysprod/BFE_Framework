@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}
-Список курсов
+    Список курсов
 {% endblock %}
 {% block style %}
 	{% include "inc-style.html" %}
@@ -9,21 +9,41 @@
 	{% include "inc-menu.html" %}
 {% endblock %}
 {% block body %}
-    <a href="/">назад</a>
-
-    <h1>Список категорий</h1>
-    <ul>
-        {% for item in objects_list %}
-        <li>
-            {{item.id}} {{item.name}} <span>Количество курсов: {{item.course_count()}}</span>
-            <div>
-                <a href="/create-course/?id={{item.id}}">Создать курс</a>
-                <a href="/courses-list/?id={{item.id}}">Список курсов</a>
-            </div>
-        </li>
-        {% endfor %}
-        <div>
-            <li><a href="/create-category/">Добавить категорию</a></li>
+    <div id="main">
+    <div id="header">
+      <div id="logo">
+        <div id="logo_text">
+          <!-- class="logo_colour", allows you to change the colour of the text -->
+          <h1><a href="/">BFE <span class="logo_colour">учебный проект</span></a></h1>
+          <h2>сложна, но я стараюсь</h2>
         </div>
-    </ul>
+      </div>
+
+    </div>
+    <div id="content_header"></div>
+    <div id="site_content">
+      <div id="content">
+        <h1>Список категорий</h1>
+        <ul>
+            {% for item in objects_list %}
+            <li>
+                <h>id({{item.id}}) {{item.name}}</h> <span>Количество курсов: {{item.course_count()}}</span>
+                <ul>
+                    <li>
+                        <a class="my_button" href="/create-course/?id={{item.id}}">Создать курс</a>
+                        <a class="my_button" href="/courses-list/?id={{item.id}}">Список курсов</a>
+                    </li>
+                </ul>
+            </li>
+            {% endfor %}
+            <div>
+                <li><a href="/create-category/">Добавить категорию</a></li>
+            </div>
+        </ul>
+      </div>
+    </div>
+    <div id="content_footer"></div>
+    <div id="footer">
+      <p>Copyright &copy; Onlyjoy's production</p>
+    </div>
 {% endblock %}
