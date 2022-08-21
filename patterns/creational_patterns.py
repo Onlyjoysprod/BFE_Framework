@@ -50,8 +50,8 @@ class Category:
     auto_id = 0
 
     def __init__(self, name, category):
-        self.id = Category.auto_id
         Category.auto_id += 1
+        self.id = Category.auto_id
         self.name = name
         self.category = category
         self.courses = []
