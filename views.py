@@ -2,27 +2,38 @@ from datetime import date
 
 from bfe_framework.templator import render
 from patterns.creational_patterns import Engine, Logger
+from patterns.structural_patterns import AppRoute, Debug
 
 site = Engine()
 logger = Logger('main')
 
+routes = {}
 
+
+@AppRoute(routes=routes, url='/')
 class Index:
+    @Debug(name='Index')
     def __call__(self, request):
         return '200 OK', render('index.html', objects_list=site.categories)
 
 
+@AppRoute(routes=routes, url='/about/')
 class About:
+    @Debug(name='About')
     def __call__(self, request):
         return '200 OK', render('about.html')
 
 
+@AppRoute(routes=routes, url='/study-programs/')
 class StudyPrograms:
+    @Debug(name='StudyPrograms')
     def __call__(self, request):
         return '200 OK', render('study-programs.html', data=date.today())
 
 
+@AppRoute(routes=routes, url='/courses-list/')
 class CoursesList:
+    @Debug(name='CoursesList')
     def __call__(self, request):
         logger.log('Список курсов')
         try:
@@ -38,22 +49,29 @@ class NotFound404:
         return '404 WHAT', render('404.html')
 
 
+@AppRoute(routes=routes, url='/create-course/')
 class CreateCourse:
     category_id = -1
 
+    @Debug(name='CreateCourse')
     def __call__(self, request):
         if request['method'] == 'POST':
             print(request)
             data = request['data']
 
-            name = data['name']
+            if data['name']:
+                name = data['name']
+            else:
+                name = f'some course'
+            type_ = data['type_']
+
             name = site.decode_value(name)
 
             category = None
             if self.category_id != -1:
                 category = site.find_category_by_id(int(self.category_id))
 
-                course = site.create_course('record', name, category)
+                course = site.create_course(type_, name, category)
                 site.courses.append(course)
 
             return '200 OK', render('course_list.html', objects_list=category.courses,
@@ -70,23 +88,32 @@ class CreateCourse:
                 return '200 OK', 'No categories have been added yet'
 
 
+@AppRoute(routes=routes, url='/create-category/')
 class CreateCategory:
+    @Debug(name='CreateCategory')
     def __call__(self, request):
 
         if request['method'] == 'POST':
             print(request)
             data = request['data']
 
-            name = data['name']
+            if data['name']:
+                name = data['name']
+            else:
+                name = 'some category'
+
             name = site.decode_value(name)
 
             category_id = data.get('category_id')
+            print(category_id)
 
             category = None
             if category_id:
                 category = site.find_category_by_id(int(category_id))
+                # name = f'{site.decode_value(category.name)}/{name}'
 
             new_category = site.create_category(name, category)
+
             site.categories.append(new_category)
 
             return '200 OK', render('category_list.html', objects_list=site.categories)
@@ -95,13 +122,17 @@ class CreateCategory:
             return '200 OK', render('create_category.html', categories=categories)
 
 
+@AppRoute(routes=routes, url='/category-list/')
 class CategoryList:
+    @Debug(name='CategoryList')
     def __call__(self, request):
         logger.log('Список категорий')
         return '200 OK', render('category_list.html', objects_list=site.categories)
 
 
+@AppRoute(routes=routes, url='/copy-course/')
 class CopyCourse:
+    @Debug(name='CopyCourse')
     def __call__(self, request):
         request_params = request['request_params']
 

@@ -32,7 +32,8 @@ class CoursePrototype:
 
 class Course(CoursePrototype):
 
-    def __init__(self, name, category):
+    def __init__(self, type_, name, category):
+        self.type_ = type_
         self.name = name
         self.category = category
         self.category.courses.append(self)
@@ -71,7 +72,7 @@ class CourseFactory:
 
     @classmethod
     def create(cls, type_, name, category):
-        return cls.types[type_](name, category)
+        return cls.types[type_](type_, name, category)
 
 
 class Engine:
