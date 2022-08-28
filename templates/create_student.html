@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}
+Создание курса
+{% endblock %}
+{% block style %}
+	{% include "inc-style.html" %}
+{% endblock %}
+{% block menu %}
+	{% include "inc-menu.html" %}
+{% endblock %}
+{% block body %}
+    <div id="main">
+    <div id="header">
+      <div id="logo">
+        <div id="logo_text">
+          <h1><a href="/">BFE <span class="logo_colour">учебный проект</span></a></h1>
+          <h2>сложна, но я стараюсь</h2>
+        </div>
+      </div>
+        </div>
+        <div id="content_header"></div>
+        <div id="site_content">
+            <div id="content">
+                <h1>Создание студента</h1>
+                <div>
+                    <li>
+                        <a href="/student-list/">Список студентов</a>
+                    </li>
+                    <li>
+                        <a href="/add-student/">Добавить студента на курс</a>
+                    </li>
+                </div><br>
+                <div>
+                    <form method="post">
+                        <input type="text" name="name" placeholder="Имя">
+                        <button type="submit">Добавить</button>
+                    </form>
+                </div>
+            </div>
+    </div>
+    <div id="content_footer"></div>
+    <div id="footer">
+      <p>Copyright &copy; Onlyjoy's production</p>
+    </div>
+{% endblock %}

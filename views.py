@@ -3,9 +3,14 @@ from datetime import date
 from bfe_framework.templator import render
 from patterns.creational_patterns import Engine, Logger
 from patterns.structural_patterns import AppRoute, Debug
+from patterns.behavioral_patterns import BaseSerializer, ListView, CreateView, \
+    TemplateView, SmsNotifier, EmailNotifier
 
 site = Engine()
 logger = Logger('main')
+
+email_notifier = EmailNotifier()
+sms_notifier = SmsNotifier()
 
 routes = {}
 
@@ -88,6 +93,44 @@ class CreateCourse:
                 return '200 OK', 'No categories have been added yet'
 
 
+@AppRoute(routes=routes, url='/update-course/')
+class UpdateCourse:
+    id = -1
+    category_id = -1
+
+    @Debug(name='UpdateCourse')
+    def __call__(self, request):
+        if request['method'] == 'POST':
+            course = site.get_course_by_id(int(self.id))
+            print(course)
+            print(request)
+            data = request['data']
+
+            if data['name']:
+                name = data['name']
+            else:
+                name = f'some course'
+            name = site.decode_value(name)
+
+            course.update_course(name)
+
+            category = site.find_category_by_id(self.category_id)
+            print(category)
+
+            return '200 OK', render('course_list.html', objects_list=category.courses,
+                                    name=category.name, id=category.id)
+
+        else:
+            print(request)
+            data = request['request_params']
+            self.id = int(data['id'])
+            self.category_id = int(data['category_id'])
+            course = site.get_course_by_id(int(self.id))
+            print(course)
+
+            return '200 OK', render('update_course.html', course=course)
+
+
 @AppRoute(routes=routes, url='/create-category/')
 class CreateCategory:
     @Debug(name='CreateCategory')
@@ -110,7 +153,6 @@ class CreateCategory:
             category = None
             if category_id:
                 category = site.find_category_by_id(int(category_id))
-                # name = f'{site.decode_value(category.name)}/{name}'
 
             new_category = site.create_category(name, category)
 
@@ -148,3 +190,51 @@ class CopyCourse:
             return '200 OK', render('course_list.html', objects_list=site.courses)
         except KeyError:
             return '200 OK', 'No courses have been added yet'
+
+
+@AppRoute(routes=routes, url='/student-list/')
+class StudentListView(ListView):
+    queryset = site.students
+    template_name = 'student_list.html'
+
+
+@AppRoute(routes=routes, url='/create-student/')
+class StudentCreateView(CreateView):
+    template_name = 'create_student.html'
+
+    def create_obj(self, data: dict):
+        if data['name']:
+            name = data['name']
+        else:
+            name = 'some student'
+        name = site.decode_value(name)
+        new_obj = site.create_user('student', name)
+        site.students.append(new_obj)
+
+
+@AppRoute(routes=routes, url='/add-student/')
+class AddStudentByCourseCreateView(CreateView):
+    template_name = 'add_student.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['courses'] = site.courses
+        context['students'] = site.students
+        return context
+
+    def create_obj(self, data: dict):
+        course_name = data['course_name']
+        course_name = site.decode_value(course_name)
+        course = site.get_course(course_name)
+        print(course)
+        student_name = data['student_name']
+        student_name = site.decode_value(student_name)
+        student = site.get_student(student_name)
+        course.add_student(student)
+
+
+@AppRoute(routes=routes, url='/api/')
+class CourseApi:
+    @Debug(name='CourseApi')
+    def __call__(self, request):
+        return '200 OK', BaseSerializer(site.courses).save()
