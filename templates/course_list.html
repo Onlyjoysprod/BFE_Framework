@@ -28,7 +28,7 @@
         <h1>Список курсов для категории "{{name}}"</h1>
         {% for item in objects_list %}
         <li>
-            {{item.name}} ({{item.type_}})
+            {{item.name}} ({{item.type_}}) <a href="/update-course/?id={{item.id}}&category_id={{id}}">Изменить</a>
         </li>
         {% endfor %}
       </div>

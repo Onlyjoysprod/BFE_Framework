@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}
+Создание курса
+{% endblock %}
+{% block style %}
+	{% include "inc-style.html" %}
+{% endblock %}
+{% block menu %}
+	{% include "inc-menu.html" %}
+{% endblock %}
+{% block body %}
+    <div id="main">
+    <div id="header">
+      <div id="logo">
+        <div id="logo_text">
+          <!-- class="logo_colour", allows you to change the colour of the text -->
+          <h1><a href="/">BFE <span class="logo_colour">учебный проект</span></a></h1>
+          <h2>сложна, но я стараюсь</h2>
+        </div>
+      </div>
+
+    </div>
+    <div id="content_header"></div>
+    <div id="site_content">
+        <div id="content">
+            <h1>Изменение курса "{{course.name}} ({{course.type_}})"</h1>
+            <form method="post">
+                <input type="text" name="name" placeholder="Новое название">
+                <button type="submit">Сохранить</button>
+            </form>
+            <p>Студенты, записанные на курс:</p>
+            {% for item in course.students %}
+                - {{item.name}}<br>
+            {% endfor %} <br><br>
+            <a href="/add-student/">Добавить студента на курс</a>
+        </div>
+    </div>
+    <div id="content_footer"></div>
+    <div id="footer">
+      <p>Copyright &copy; Onlyjoy's production</p>
+    </div>
+{% endblock %}
