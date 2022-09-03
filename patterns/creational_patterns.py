@@ -15,7 +15,9 @@ class Teacher(User):
 
 class Student(User, DomainObject):
     def __init__(self, name):
+        self.id = 0
         self.courses = []
+        self.course_list = ''
         super().__init__(name)
 
 

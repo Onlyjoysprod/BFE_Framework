@@ -13,9 +13,11 @@ class StudentMapper:
         self.cursor.execute(statement)
         result = []
         for item in self.cursor.fetchall():
-            id, name = item
+            id, name, course_list = item
             student = Student(name)
             student.id = id
+            if course_list:
+                student.courses = course_list.split('~')[1:]
             result.append(student)
         return result
 
@@ -29,12 +31,15 @@ class StudentMapper:
             raise RecordNotFoundException(f'record with id={id} not found')
 
     def find_by_name(self, name):
-        statement = f"SELECT id, name FROM {self.tablename} WHERE name=?"
+        statement = f"SELECT id, name, courses FROM {self.tablename} WHERE name=?"
         self.cursor.execute(statement, (name,))
         result = self.cursor.fetchone()
-        id, name = result
+        id, name, course_list = result
         if result:
-            return Student(name)
+            student = Student(name)
+            student.id = id
+            student.course_list = course_list
+            return student
         else:
             raise RecordNotFoundException(f'record with id={id} not found')
 
@@ -47,8 +52,9 @@ class StudentMapper:
             raise DbCommitException(e.args)
 
     def update(self, obj):
-        statement = f"UPDATE {self.tablename} SET name=? WHERE id=?"
-        self.cursor.execute(statement, (obj.name, obj.id))
+        statement = f"UPDATE {self.tablename} SET courses=? WHERE id=?"
+        print('11111111111111111', obj)
+        self.cursor.execute(statement, (obj.course_list, obj.id))
         try:
             self.connection.commit()
         except Exception as e:

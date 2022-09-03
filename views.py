@@ -246,11 +246,14 @@ class AddStudentByCourseCreateView(PostGetView):
         student_name = data['student_name']
         student_name = site.decode_value(student_name)
         student = MapperRegistry.get_current_mapper('student').find_by_name(student_name)
+        print('000000000000', student.course_list)
+        student.course_list = f'{student.course_list}~{course.name}'
+        # course.add_student(student)
 
-        course.add_student(student)
-
-        student.mark_new()
+        student.mark_dirty()
         UnitOfWork.get_current().commit()
+
+        print('```````', student.course_list)
 
 
 @AppRoute(routes=routes, url='/api/')
