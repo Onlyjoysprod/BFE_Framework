@@ -1,6 +1,7 @@
 import copy
 import quopri
 from .behavioral_patterns import ConsoleWriter, Subject
+from .architectural_system_pattern_unit_of_work import DomainObject
 
 
 class User:
@@ -12,9 +13,11 @@ class Teacher(User):
     pass
 
 
-class Student(User):
+class Student(User, DomainObject):
     def __init__(self, name):
+        self.id = 0
         self.courses = []
+        self.course_list = ''
         super().__init__(name)
 
 
@@ -34,16 +37,17 @@ class CoursePrototype:
         return copy.deepcopy(self)
 
 
-class Course(CoursePrototype, Subject):
+class Course(CoursePrototype, Subject, DomainObject):
     auto_id = 0
 
-    def __init__(self, type_, name, category):
+    def __init__(self, type_, name, category_id):
         Course.auto_id += 1
         self.id = Course.auto_id
         self.type_ = type_
         self.name = name
-        self.category = category
-        self.category.courses.append(self)
+        # self.category = category
+        self.category_id = category_id
+        # self.category.courses.append(self)
         self.students = []
         super().__init__()
 
@@ -53,7 +57,7 @@ class Course(CoursePrototype, Subject):
     def add_student(self, student: Student):
         self.students.append(student)
         student.courses.append(self)
-        self.notify(self)
+        self.notify()
 
     def update_course(self, name):
         self.name = name
@@ -67,12 +71,9 @@ class RecordCourse(Course):
     pass
 
 
-class Category:
-    auto_id = 0
-
+class Category(DomainObject):
     def __init__(self, name, category):
-        Category.auto_id += 1
-        self.id = Category.auto_id
+
         self.name = name
         self.category = category
         self.courses = []

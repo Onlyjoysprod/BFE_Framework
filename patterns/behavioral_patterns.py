@@ -13,12 +13,12 @@ class Observer:
 
 class Subject:
     def __init__(self):
-        self.observers = [SmsNotifier, EmailNotifier]
+        self.observers = []
 
-    def notify(self, sub):
+    def notify(self):
         print('observers: ', self.observers)
         for item in self.observers:
-            item.update(self, sub)
+            item.update(self)
 
 
 class SmsNotifier(Observer):
@@ -46,6 +46,8 @@ class BaseSerializer:
 
 
 class TemplateView:
+    local_data = []
+    context = {}
     template_name = 'template.html'
 
     def get_context_data(self):
@@ -59,6 +61,10 @@ class TemplateView:
         context = self.get_context_data()
         return '200 OK', render(template_name, **context)
 
+    def render_template_with_params(self, params):
+        template_name = self.get_template()
+        return '200 OK', render(template_name, **params)
+
     def __call__(self, requests):
         return self.render_template_with_context()
 
@@ -69,7 +75,6 @@ class ListView(TemplateView):
     context_object_name = 'objects_list'
 
     def get_queryset(self):
-        print(self.queryset)
         return self.queryset
 
     def get_context_object_name(self):
@@ -81,25 +86,57 @@ class ListView(TemplateView):
         context = {context_object_name: queryset}
         return context
 
+    # def __call__(self, request):
+    #     pass
 
-class CreateView(TemplateView):
+
+class PostGetView(TemplateView):
+    queryset = []
     template_name = 'create.html'
+    context_object_name = 'request_params'
 
+    # data из post
     @staticmethod
     def get_request_data(request):
         return request['data']
 
-    def create_obj(self, data):
+    # params из get
+    def get_request_params(self, request):
+        if request['request_params']:
+            return request['request_params']
+        else:
+            return {'request_params': []}
+
+    def control_post(self, data):
         pass
+
+    def control_get(self, params):
+        pass
+
+    def get_queryset(self):
+        return self.queryset
+
+    def get_context_object_name(self):
+        return self.context_object_name
 
     def __call__(self, request):
         if request['method'] == 'POST':
             data = self.get_request_data(request)
-            self.create_obj(data)
-
-            return self.render_template_with_context()
+            self.control_post(data)
+            params = self.local_data
+            try:
+                return self.render_template_with_params(params)
+            except TypeError:
+                return self.render_template_with_context()
         else:
-            return super().__call__(request)
+            try:
+                params = self.get_request_params(request)
+                params = self.control_get(params)
+                self.local_data = params
+                return self.render_template_with_params(params)
+            except TypeError:
+                print('FAAAIL')
+                return super().__call__(request)
 
 
 class ConsoleWriter:
