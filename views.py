@@ -57,7 +57,14 @@ class CreateCourse(PostGetView):
             name = data['name']
         else:
             name = f'some course'
+
         name = site.decode_value(name)
+
+        splitter = '~'
+        if splitter in name:
+            print('WRONG NAME')
+            return
+
         type_ = data['type_']
 
         self.category_id = self.local_data['id']
@@ -74,44 +81,6 @@ class CreateCourse(PostGetView):
 
             course.mark_new()
             UnitOfWork.get_current().commit()
-
-
-# @AppRoute(routes=routes, url='/update-course/')
-# class UpdateCourse:
-#     id = -1
-#     category_id = -1
-#
-#     @Debug(name='UpdateCourse')
-#     def __call__(self, request):
-#         if request['method'] == 'POST':
-#             course = site.get_course_by_id(int(self.id))
-#             print(course)
-#             print(request)
-#             data = request['data']
-#
-#             if data['name']:
-#                 name = data['name']
-#             else:
-#                 name = f'some course'
-#             name = site.decode_value(name)
-#
-#             course.update_course(name)
-#
-#             category = site.find_category_by_id(self.category_id)
-#             print(category)
-#
-#             return '200 OK', render('course_list.html', objects_list=category.courses,
-#                                     name=category.name, id=category.id)
-#
-#         else:
-#             print(request)
-#             data = request['request_params']
-#             self.id = int(data['id'])
-#             self.category_id = int(data['category_id'])
-#             course = site.get_course_by_id(int(self.id))
-#             print(course)
-#
-#             return '200 OK', render('update_course.html', course=course)
 
 
 @AppRoute(routes=routes, url='/courses-list/')
@@ -182,26 +151,6 @@ class CategoryList(PostGetView):
         return params
 
 
-# @AppRoute(routes=routes, url='/copy-course/')
-# class CopyCourse:
-#     @Debug(name='CopyCourse')
-#     def __call__(self, request):
-#         request_params = request['request_params']
-#
-#         try:
-#             name = request_params['name']
-#             old_course = site.get_course(name)
-#             if old_course:
-#                 new_name = f'copy_{name}'
-#                 new_course = old_course.clone()
-#                 new_course.name = new_name
-#                 site.courses.append(new_course)
-#
-#             return '200 OK', render('course_list.html', objects_list=site.courses)
-#         except KeyError:
-#             return '200 OK', 'No courses have been added yet'
-
-
 @AppRoute(routes=routes, url='/student-list/')
 class StudentListView(ListView):
     template_name = 'student_list.html'
@@ -246,14 +195,10 @@ class AddStudentByCourseCreateView(PostGetView):
         student_name = data['student_name']
         student_name = site.decode_value(student_name)
         student = MapperRegistry.get_current_mapper('student').find_by_name(student_name)
-        print('000000000000', student.course_list)
         student.course_list = f'{student.course_list}~{course.name}'
-        # course.add_student(student)
 
         student.mark_dirty()
         UnitOfWork.get_current().commit()
-
-        print('```````', student.course_list)
 
 
 @AppRoute(routes=routes, url='/api/')
